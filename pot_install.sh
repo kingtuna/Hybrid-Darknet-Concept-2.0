@@ -68,6 +68,7 @@ mv -f /tmp/node.cfg /nsm/bro/etc/node.cfg
 
 export PATH=/nsm/bro/bin:$PATH
 /nsm/bro/bin/broctl install
+/nsm/bro/bin/broctl deploy
 /nsm/bro/bin/broctl start
 
 cd /root/build/
@@ -117,7 +118,7 @@ IHJlc3AKICAgIGRhdGUgewogICAgICBtYXRjaCA9PiBbICJ0cyIsICJVTklYIiBdCiAgICAgIGFk
 ZF90YWcgPT4gWyAidHNtYXRjaCIgXQogICAgfSAjZW5kIGRhdGUKICAgIGlmIFtpZC5vcmlnX2hd
 ID09ICJzdHJpbmciIG9yIFtpZC5vcmlnX2hdID09ICJ1aWQiIHsKICAgICAgZHJvcCB7fQogICAg
 fSAjZ2V0IHJpZCBvZiBzdHJhbmdlIHJlY29yZHMgd2hlbiBmaWxlIHJvdGF0aW9uIG9jY3Vycwog
-IH0gIyMjI2VuZCBicm9fY29ubiMjIyMKCiMjI0VORCBGaWx0ZXIKfQoK'| base64 -d > /etc/logstash/conf.d/logstash-bro.conf
+IH0gIyMjI2VuZCBicm9fY29ubiMjIyMKCiMjI0VORCBGaWx0ZXIKfQoK'| base64 -d > /etc/logstash/conf.d/logstash.conf
 
 printf "output {
   rabbitmq {
@@ -132,7 +133,6 @@ printf "output {
      persistent => false
      heartbeat => 2
      host => \"$RABBIT_HOST\"
-     subscription_retry_interval_seconds => 5
      connection_timeout => 3000
   }
 }" >> /etc/logstash/conf.d/logstash-bro.conf
