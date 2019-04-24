@@ -135,8 +135,9 @@ printf "output {
      host => \"$RABBIT_HOST\"
      connection_timeout => 3000
   }
-}" >> /etc/logstash/conf.d/logstash-bro.conf
+}" >> /etc/logstash/conf.d/logstash.conf
 
+service ennable logstash
 ##UPDATEGEOLITE
 echo "
 cd /root/build/
