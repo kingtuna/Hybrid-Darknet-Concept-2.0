@@ -155,7 +155,7 @@ mv -f GeoLite2-ASN_*/GeoLite2-ASN.mmdb  /usr/share/GeoIP/GeoLite2-ASN.mmdb
 rm- fr GeoLite*
 " > /root/geoupdate.sh
 
-chmod +x geoupdate.sh
+chmod +x /root/geoupdate.sh
 
 #### Cleanup
 echo "net.ipv4.tcp_keepalive_intvl=570" >> /etc/sysctl.conf
