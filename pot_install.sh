@@ -23,7 +23,7 @@ apt -y install logstash
 
 ##HOSTNAME
 OLDHOSTNAME=`cat /etc/hostname`
-echo DARKNET-`/sbin/ifconfig $INTERFACE | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`> /etc/hostname
+echo "DARKNET-"`/sbin/ifconfig $INTERFACE | grep 'inet ' | awk '{print $2}'`
 NEWHOSTNAME=`cat /etc/hostname`
 hostname $NEWHOSTNAME
 cat /etc/hosts | sed  s/$OLDHOSTNAME/$NEWHOSTNAME/g > /tmp/hosts
