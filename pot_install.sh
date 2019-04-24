@@ -5,6 +5,9 @@
 ###
 
 INTERFACE='eth0'
+RABBIT_USER='amp'
+RABBIT_PASSWORD='password'
+RABBIT_HOST='1.1.1.1'
 
 ## install elastic repositories
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
@@ -73,7 +76,7 @@ cd /root/build/
 rm /etc/logstash/logstash-sample.conf
 /usr/share/logstash/bin/logstash-plugin install logstash-filter-translate
 
-aW5wdXQgewogIGZpbGUgewogICAgcGF0aCA9PiBbICIvbnNtL2Jyby9sb2dzL2N1cnJlbnQvY29u
+printf 'aW5wdXQgewogIGZpbGUgewogICAgcGF0aCA9PiBbICIvbnNtL2Jyby9sb2dzL2N1cnJlbnQvY29u
 bi5sb2ciIF0gIyBhcnJheSAocmVxdWlyZWQpCiAgICB0eXBlID0+ICJicm8iCiAgICB0YWdzID0+
 IFsgImJyb19jb25uIiBdCiAgfQp9CgpmaWx0ZXIgewogIGlmIFttZXNzYWdlXSA9fiAvXiMvIHsK
 ICAgIGRyb3AgeyB9CiAgfSAjZW5kIGlmCgogICMjIyNiZWdpbiBicm9fY29ubiMjIyMKICAjIyBU
@@ -114,8 +117,25 @@ IHJlc3AKICAgIGRhdGUgewogICAgICBtYXRjaCA9PiBbICJ0cyIsICJVTklYIiBdCiAgICAgIGFk
 ZF90YWcgPT4gWyAidHNtYXRjaCIgXQogICAgfSAjZW5kIGRhdGUKICAgIGlmIFtpZC5vcmlnX2hd
 ID09ICJzdHJpbmciIG9yIFtpZC5vcmlnX2hdID09ICJ1aWQiIHsKICAgICAgZHJvcCB7fQogICAg
 fSAjZ2V0IHJpZCBvZiBzdHJhbmdlIHJlY29yZHMgd2hlbiBmaWxlIHJvdGF0aW9uIG9jY3Vycwog
-IH0gIyMjI2VuZCBicm9fY29ubiMjIyMKCiMjI0VORCBGaWx0ZXIKfQoK
+IH0gIyMjI2VuZCBicm9fY29ubiMjIyMKCiMjI0VORCBGaWx0ZXIKfQoK'| base64 -d > /etc/logstash/conf.d/logstash-bro.conf
 
+printf "output {
+  rabbitmq {
+     user => \"$RABBIT_USER\"
+     exchange_type => \"direct\"
+     password => \"$RABBIT_PASSWORD\"
+     exchange => \"darknet-data-ext.direct\"
+     vhost => \"/\"
+     durable => true
+     ssl => false
+     port => 5672
+     persistent => false
+     heartbeat => 2
+     host => \"$RABBIT_HOST\"
+     subscription_retry_interval_seconds => 5
+     connection_timeout => 3000
+  }
+}" >> /etc/logstash/conf.d/logstash-bro.conf
 
 ##UPDATEGEOLITE
 echo "
@@ -139,13 +159,6 @@ chmod +x geoupdate.sh
 
 #### Cleanup
 echo "net.ipv4.tcp_keepalive_intvl=570" >> /etc/sysctl.conf
-printf '0-59/5 * * * * /nsm/bro/bin/broctl cron
-23 2 * * * /root/geoupdate.sh
-' > crontab.txt
-crontab crontab.txt
-
-systemctl enable logstash
-systemctl start logstash
 
 mv /etc/ssh/sshd_config /etc/ssh/sshd_config.old
 cat /etc/ssh/sshd_config.old | sed '/Port 22$/c\Port 42224' > /etc/ssh/sshd_config
